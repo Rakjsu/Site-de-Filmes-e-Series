@@ -30,7 +30,7 @@ Plataforma de streaming para filmes e séries, com reprodução de vídeos, gere
 
 1. Clone o repositório
 ```bash
-git clone https://github.com/seu-usuario/Site-de-Filmes-e-Series.git
+git clone https://github.com/usuario-generico/Site-de-Filmes-e-Series.git
 ```
 
 2. Configure seu servidor web para apontar para o diretório do projeto

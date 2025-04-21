@@ -10,9 +10,9 @@
 
 // Definir configurações do banco de dados
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'player');
-define('DB_USER', 'root');
-define('DB_PASS', '05062981');
+define('DB_NAME', 'filmes_series_db');
+define('DB_USER', 'usuario_db');
+define('DB_PASS', 'senha_segura_123');
 define('DB_CHARSET', 'utf8mb4');
 
 // Conexão PDO
