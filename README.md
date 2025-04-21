@@ -37,10 +37,10 @@ git clone https://github.com/Rakjsu/Site-de-Filmes-e-Series.git
 
 3. Importe o arquivo de banco de dados
 ```bash
-mysql -u usuario -p nome_do_banco < api/database.sql
+mysql -u root -p site < api/database.sql
 ```
 
-4. Configure as credenciais de banco de dados em `home_files/db_config.php`
+4. Configure as credenciais de banco de dados em `db_config.php` (já configurado com valores padrão)
 
 5. Acesse o site através do navegador
 
