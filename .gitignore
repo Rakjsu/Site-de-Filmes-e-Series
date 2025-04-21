@@ -1,0 +1,27 @@
+# Arquivos de configuração e ambientes
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Diretórios específicos
+/node_modules
+/vendor
+/.vscode
+/.idea
+/temp
+/tmp
+/logs
+
+# Outros arquivos
+*.log
+*.tmp
+*.bak
+*.swp
+*~ 

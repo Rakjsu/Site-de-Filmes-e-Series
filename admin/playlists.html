@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Playlists | Player Admin</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <!-- Custom Admin CSS -->
+    <link href="css/admin.css" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Player Admin</h2>
+                <button class="btn btn-toggle-sidebar d-md-none" id="toggle-sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div class="sidebar-content">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="videos.html">
+                            <i class="fas fa-film"></i> Vídeos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="playlists.html">
+                            <i class="fas fa-list"></i> Playlists
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="users.html">
+                            <i class="fas fa-users"></i> Usuários
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="analytics.html">
+                            <i class="fas fa-chart-bar"></i> Analytics
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="settings.html">
+                            <i class="fas fa-cog"></i> Configurações
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="content-header">
+                <div class="container-fluid">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h1><i class="fas fa-list me-2"></i>Gerenciador de Playlists</h1>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-primary" id="newPlaylistBtn">
+                                <i class="fas fa-plus"></i> Nova Playlist
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Body -->
+            <div class="content-body">
+                <div class="container-fluid">
+                    <!-- Alerts Container -->
+                    <div id="alertsContainer" class="alerts-container"></div>
+
+                    <!-- Playlists List -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-list me-2"></i>Minhas Playlists</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="playlistsTable" class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nome</th>
+                                            <th>Vídeos</th>
+                                            <th>Status</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Dados da tabela inseridos dinamicamente via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Playlist Details -->
+                    <div class="row">
+                        <div class="col-12">
+                            <!-- Empty State -->
+                            <div id="playlistEmptyState" class="text-center py-5 d-none">
+                                <i class="fas fa-list-ul fa-4x text-muted mb-3"></i>
+                                <h4 class="text-muted">Nenhuma playlist selecionada</h4>
+                                <p class="text-muted">Selecione uma playlist existente para editar ou crie uma nova.</p>
+                                <button class="btn btn-primary" id="createNewPlaylistBtn">
+                                    <i class="fas fa-plus"></i> Criar Nova Playlist
+                                </button>
+                            </div>
+
+                            <!-- Playlist Detail Card -->
+                            <div id="playlistDetailCard" class="card mb-4">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Detalhes da Playlist</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <!-- Playlist Form -->
+                                        <div class="col-lg-4">
+                                            <div class="mb-3">
+                                                <label for="playlistName" class="form-label">Nome da Playlist</label>
+                                                <input type="text" class="form-control" id="playlistName" placeholder="Nome da playlist">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="playlistDescription" class="form-label">Descrição</label>
+                                                <textarea class="form-control" id="playlistDescription" rows="3" placeholder="Descrição da playlist"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="playlistSlug" class="form-label">Slug (URL)</label>
+                                                <input type="text" class="form-control" id="playlistSlug" placeholder="slug-da-playlist">
+                                                <small class="text-muted">URL amigável para a playlist</small>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="playlistStatus" class="form-label">Status</label>
+                                                <select class="form-select" id="playlistStatus">
+                                                    <option value="active">Ativa</option>
+                                                    <option value="inactive">Inativa</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <button id="savePlaylistBtn" class="btn btn-primary w-100">
+                                                    <i class="fas fa-save me-1"></i> Salvar Playlist
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Videos List -->
+                                        <div class="col-lg-8">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h5>Vídeos na Playlist</h5>
+                                                <button class="btn btn-sm btn-outline-primary" id="addVideoToPlaylistBtn">
+                                                    <i class="fas fa-plus me-1"></i> Adicionar Vídeos
+                                                </button>
+                                            </div>
+                                            <div class="playlist-videos-container">
+                                                <div id="playlistVideosList" class="list-group playlist-videos">
+                                                    <!-- Vídeos inseridos dinamicamente via JavaScript -->
+                                                </div>
+                                            </div>
+                                            <small class="text-muted mt-2">Arraste os vídeos para reordenar a playlist.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="content-footer">
+                <div class="container-fluid">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                        <p class="mb-0">© 2023 Player Admin. Todos os direitos reservados.</p>
+                        <p class="mb-0"><a href="#" class="text-reset text-decoration-none">Documentação</a> | <a href="#" class="text-reset text-decoration-none">Suporte</a></p>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Add Video Modal -->
+    <div class="modal fade" id="addVideoModal" tabindex="-1" aria-labelledby="addVideoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addVideoModalLabel">Adicionar Vídeos à Playlist</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" id="videoSearchInput" placeholder="Pesquisar vídeos...">
+                        </div>
+                        <small class="text-muted">Clique nos vídeos para selecioná-los. Você pode selecionar múltiplos vídeos.</small>
+                    </div>
+                    <div class="available-videos-container">
+                        <div id="availableVideosList" class="list-group">
+                            <!-- Vídeos disponíveis inseridos dinamicamente via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="confirmAddVideosBtn">
+                        <i class="fas fa-plus me-1"></i> Adicionar Selecionados
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Required JavaScript -->
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap 5 Bundle JS (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Sortable.js -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <!-- Custom Admin JS -->
+    <script src="js/playlists.js"></script>
+</body>
+</html> 

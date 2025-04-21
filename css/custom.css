@@ -1,0 +1,250 @@
+/* Estilos personalizados adicionais */
+
+/* Animação do botão Próximo Episódio */
+@keyframes pulseButton {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.btn-next {
+    animation: pulseButton 2s infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-next::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shineEffect 2.5s infinite;
+}
+
+@keyframes shineEffect {
+    0% { left: -100%; }
+    20% { left: 100%; }
+    100% { left: 100%; }
+}
+
+/* Melhoria no container de próximo episódio */
+.next-video-container {
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+}
+
+.next-video-container.active {
+    transform: translateY(0) scale(1);
+}
+
+.next-video-container:not(.active) {
+    transform: translateY(20px) scale(0.95);
+}
+
+/* Estilo especial para telas menores */
+@media (max-width: 768px) {
+    .next-video-box {
+        background: rgba(28, 28, 28, 0.95);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+    
+    .btn-next {
+        background: linear-gradient(45deg, #e50914, #ff3b30);
+    }
+}
+
+/* Variantes de cores (podem ser facilmente personalizadas) */
+:root {
+    --primary-color: #e50914;
+    --primary-hover: #f40612;
+    --text-primary: #ffffff;
+    --text-secondary: #aaaaaa;
+    --bg-dark: rgba(28, 28, 28, 0.9);
+    --bg-darker: #121212;
+    --shadow-color: rgba(229, 9, 20, 0.4);
+}
+
+/* Botão de Administração */
+.admin-button-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.admin-button {
+    background-color: #e50914;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.admin-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.admin-button i {
+    font-size: 20px;
+}
+
+.admin-tooltip {
+    position: absolute;
+    bottom: 60px;
+    right: 0;
+    background-color: rgba(28, 28, 28, 0.95);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.admin-button-container:hover .admin-tooltip {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Estilos para o modal de login */
+.login-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1001;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-modal.active {
+    display: flex;
+}
+
+.login-form {
+    background-color: #1a1a1a;
+    border-radius: 8px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.login-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: L20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #333;
+}
+
+.login-header h3 {
+    color: white;
+    margin: 0;
+}
+
+.login-close {
+    background: transparent;
+    color: #999;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.login-close:hover {
+    color: white;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #ccc;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #333;
+    background-color: #222;
+    color: white;
+    border-radius: 4px;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #e50914;
+}
+
+.login-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.login-button {
+    background-color: #e50914;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.login-button:hover {
+    background-color: #f40612;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+}
+
+.remember-me input {
+    margin-right: 5px;
+}
+
+.remember-me label {
+    color: #ccc;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .admin-button-container {
+        bottom: 15px;
+        right: 15px;
+    }
+    
+    .admin-button {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .login-form {
+        padding: 15px;
+    }
+} 
