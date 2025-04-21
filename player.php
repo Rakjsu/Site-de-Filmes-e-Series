@@ -92,9 +92,13 @@ if ($videoId) {
             <nav class="main-nav">
                 <ul>
                     <li><a href="index.php">Início</a></li>
-                    <li><a href="categorias.php">Categorias</a></li>
+                    <li><a href="filmes.php">Filmes</a></li>
+                    <li><a href="series.php">Séries</a></li>
+                    <li><a href="generos.php">Gêneros</a></li>
                     <li><a href="novidades.php">Novidades</a></li>
-                    <li><a href="player.php" class="active">Player</a></li>
+                    <?php if (isAdmin()): ?>
+                    <li><a href="admin/index.php">Admin</a></li>
+                    <?php endif; ?>
                 </ul>
             </nav>
             
