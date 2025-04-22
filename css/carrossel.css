@@ -1,0 +1,448 @@
+/**
+ * Estilos para o componente de carrossel
+ * 
+ * Este arquivo contém todos os estilos necessários para os carrosséis
+ * de conteúdo, incluindo layout, navegação, animações e responsividade.
+ * 
+ * @package Player
+ * @version 1.0.0
+ */
+
+/* Estrutura principal do carrossel */
+.carrossel-secao {
+    position: relative;
+    margin: 2rem 0;
+    padding: 0 0.5rem;
+}
+
+.carrossel-titulo {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--cor-texto-primaria, #333);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.carrossel-titulo i {
+    color: var(--cor-primaria, #0066cc);
+    font-size: 1.25rem;
+}
+
+.carrossel-ver-todos {
+    margin-left: auto;
+    font-size: 0.875rem;
+    color: var(--cor-primaria, #0066cc);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+
+.carrossel-ver-todos:hover {
+    color: var(--cor-primaria-escura, #004c99);
+    text-decoration: underline;
+}
+
+.carrossel-ver-todos i {
+    margin-left: 0.25rem;
+    font-size: 0.75rem;
+}
+
+/* Container dos itens e wrapper */
+.carrossel-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.carrossel-items-wrapper {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+.carrossel-items {
+    display: flex;
+    transition: transform 0.5s ease;
+    will-change: transform;
+}
+
+/* Estilo quando arrastando */
+.carrossel-items.dragging {
+    cursor: grabbing;
+    transition: none;
+}
+
+.is-dragging {
+    cursor: grabbing;
+}
+
+/* Item do carrossel */
+.carrossel-item {
+    flex: 0 0 calc(20% - 1rem); /* 5 itens por linha por padrão */
+    margin: 0 0.5rem;
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.carrossel-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Conteúdo do item */
+.conteudo-card {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 150%; /* Proporção 2:3 para os cards */
+    overflow: hidden;
+    background-color: #000;
+    border-radius: 8px;
+}
+
+.conteudo-imagem {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.carrossel-item:hover .conteudo-imagem {
+    transform: scale(1.05);
+    opacity: 0.8;
+}
+
+.conteudo-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 3.5rem 1rem 1rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0));
+    color: #fff;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+}
+
+.carrossel-item:hover .conteudo-info {
+    transform: translateY(-10px);
+}
+
+.conteudo-titulo {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.conteudo-metadados {
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+    opacity: 0.8;
+}
+
+.conteudo-categoria {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    margin-right: 0.25rem;
+    white-space: nowrap;
+}
+
+.conteudo-avaliacao {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.conteudo-avaliacao i {
+    color: #ffcc00;
+    font-size: 0.8rem;
+}
+
+/* Botões de ação no card */
+.conteudo-botoes {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    opacity: 0;
+    transform: translateX(5px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.carrossel-item:hover .conteudo-botoes {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.conteudo-botao {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.conteudo-botao:hover {
+    background-color: var(--cor-primaria, #0066cc);
+    transform: scale(1.1);
+}
+
+.conteudo-botao.favorito-ativo {
+    background-color: var(--cor-primaria, #0066cc);
+}
+
+/* Badge para novos conteúdos */
+.conteudo-badge {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background-color: var(--cor-destaque, #ff4757);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+    z-index: 1;
+}
+
+/* Navegação do carrossel */
+.carrossel-nav {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    left: 0;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.carrossel-prev,
+.carrossel-next {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    pointer-events: auto;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+}
+
+.carrossel-prev {
+    margin-left: -1.25rem;
+}
+
+.carrossel-next {
+    margin-right: -1.25rem;
+}
+
+.carrossel-prev:hover,
+.carrossel-next:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.1);
+}
+
+.carrossel-prev:focus,
+.carrossel-next:focus {
+    outline: 2px solid var(--cor-primaria, #0066cc);
+    outline-offset: 2px;
+}
+
+/* Paginação do carrossel */
+.carrossel-paginacao {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.carrossel-pagina {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+}
+
+.carrossel-pagina:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.carrossel-pagina.ativa {
+    background-color: var(--cor-primaria, #0066cc);
+    transform: scale(1.2);
+}
+
+/* Estado sem conteúdo */
+.carrossel-vazio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    text-align: center;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+.carrossel-vazio i {
+    font-size: 2rem;
+    color: #999;
+    margin-bottom: 1rem;
+}
+
+.carrossel-vazio-texto {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.carrossel-vazio-botao {
+    padding: 0.5rem 1rem;
+    background-color: var(--cor-primaria, #0066cc);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.carrossel-vazio-botao:hover {
+    background-color: var(--cor-primaria-escura, #004c99);
+}
+
+/* Animações */
+@keyframes pulsar {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.conteudo-destaque {
+    animation: pulsar 2s infinite;
+}
+
+/* Responsividade */
+@media (max-width: 1200px) {
+    .carrossel-item {
+        flex: 0 0 calc(25% - 1rem); /* 4 itens por linha */
+    }
+}
+
+@media (max-width: 992px) {
+    .carrossel-item {
+        flex: 0 0 calc(33.333% - 1rem); /* 3 itens por linha */
+    }
+}
+
+@media (max-width: 768px) {
+    .carrossel-item {
+        flex: 0 0 calc(50% - 1rem); /* 2 itens por linha */
+    }
+    
+    .carrossel-titulo {
+        font-size: 1.25rem;
+    }
+    
+    .conteudo-titulo {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .carrossel-item {
+        flex: 0 0 calc(100% - 1rem); /* 1 item por linha */
+    }
+    
+    .carrossel-prev,
+    .carrossel-next {
+        width: 2rem;
+        height: 2rem;
+    }
+}
+
+/* Tema escuro */
+@media (prefers-color-scheme: dark) {
+    .carrossel-titulo {
+        color: #f5f5f5;
+    }
+    
+    .carrossel-pagina {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .carrossel-pagina:hover {
+        background-color: rgba(255, 255, 255, 0.4);
+    }
+    
+    .carrossel-vazio {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .carrossel-vazio i,
+    .carrossel-vazio-texto {
+        color: #aaa;
+    }
+    
+    .carrossel-prev,
+    .carrossel-next {
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+    
+    .carrossel-prev:hover,
+    .carrossel-next:hover {
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+}
+
+.carrossel-item-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+} 

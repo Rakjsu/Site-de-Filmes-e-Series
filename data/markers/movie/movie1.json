@@ -1,0 +1,21 @@
+{
+    "markers": [
+        {
+            "time": 120,
+            "title": "Introdução do vilão"
+        },
+        {
+            "time": 300,
+            "title": "Cena de ação"
+        },
+        {
+            "time": 450,
+            "title": "Reviravolta na trama"
+        },
+        {
+            "time": 600,
+            "title": "Clímax"
+        }
+    ],
+    "updatedAt": "2023-08-30 15:30:00"
+} 

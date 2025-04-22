@@ -47,8 +47,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_log("Tentativa de login: username=$username, resultado=" . $result['status']);
         
         if ($result['status'] === 'success') {
-            // Redirecionar após login bem-sucedido
-            header('Location: index.php');
+            if ($result['user']['isAdmin']) {
+                header('Location: admin/index.php');
+            } else {
+                header('Location: index.php');
+            }
             exit;
         } else {
             $error = $result['message'];
@@ -271,8 +274,11 @@ if (isset($_GET['error']) && $_GET['error'] === 'auth_required') {
                     dataType: 'json',
                     success: function(response) {
                         if (response.status === 'success') {
-                            // Login bem-sucedido, redirecionar
-                            window.location.href = 'index.php';
+                            if (response.user['isAdmin']) {
+                                window.location.href = 'admin/index.php';
+                            } else {
+                                window.location.href = 'index.php';
+                            }
                         } else {
                             // Exibir mensagem de erro
                             $('#errorMessage').text(response.message);

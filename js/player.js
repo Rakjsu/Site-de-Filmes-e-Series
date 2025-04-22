@@ -1,410 +1,316 @@
+/**
+ * player.js - Funções relacionadas ao player de vídeo
+ * 
+ * Este arquivo contém todas as funcionalidades relacionadas ao player de vídeo, incluindo:
+ * - Inicialização do player Video.js
+ * - Controle de reprodução de conteúdo
+ * - Salvamento do progresso de reprodução
+ * - Marcação de conteúdo como assistido
+ * - Gerenciamento de favoritos
+ */
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Elementos do player
-    const videoContainer = document.querySelector('.video-container');
-    const mainVideo = document.getElementById('main-video');
-    const progressArea = document.querySelector('.progress-area');
-    const progressBar = document.querySelector('.progress-bar');
-    const bufferBar = document.querySelector('.buffer-bar');
-    const playPauseBtn = document.querySelector('.play-pause');
-    const volumeBtn = document.querySelector('.volume-btn');
-    const volumeSlider = document.querySelector('.volume-slider');
-    const timeDisplay = document.querySelector('.time-display');
-    const settingsBtn = document.querySelector('.settings-btn');
-    const settingsMenu = document.querySelector('.settings-menu');
-    const qualityMenu = document.getElementById('quality-menu');
-    const captionsMenu = document.getElementById('captions-menu');
-    const mainMenu = document.getElementById('main-menu');
-    const speedBtn = document.querySelector('.speed-btn');
-    const qualityBtn = document.querySelector('.quality-btn');
-    const captionsBtn = document.querySelector('.captions-btn');
-    const pipBtn = document.querySelector('.pip-btn');
-    const fullscreenBtn = document.querySelector('.fullscreen-btn');
-    const loadingOverlay = document.querySelector('.loading-overlay');
-    const backButtons = document.querySelectorAll('.back-button');
-    const nextVideoContainer = document.querySelector('.next-video-container');
-    const playlistItems = document.querySelectorAll('.playlist-item');
+    // Inicializa o player de vídeo quando existir no DOM
+    const videoElement = document.getElementById('content-player');
     
-    // Variáveis de estado
-    let userActivity = null;
-    let controlsTimeout = null;
-    let currentVolume = 0.8;
-    let isSettingsOpen = false;
+    if (videoElement) {
+        initializeVideoPlayer();
+    }
     
-    // Inicializar o player
-    init();
+    // Configura os botões de ações do usuário
+    setupUserActionButtons();
+});
+
+/**
+ * Inicializa o player de vídeo utilizando Video.js
+ */
+function initializeVideoPlayer() {
+    const videoElement = document.getElementById('content-player');
     
-    // Função de inicialização
-    function init() {
-        // Definir volume inicial
-        mainVideo.volume = currentVolume;
-        volumeSlider.value = currentVolume * 100;
-        
-        // Atualizar buffer durante o carregamento
-        mainVideo.addEventListener('progress', updateBuffer);
-        
-        // Mostrar loading ao iniciar o carregamento
-        mainVideo.addEventListener('loadstart', () => {
-            loadingOverlay.classList.add('active');
-        });
-        
-        // Esconder loading quando o vídeo estiver pronto
-        mainVideo.addEventListener('canplay', () => {
-            loadingOverlay.classList.remove('active');
-        });
-        
-        // Mostrar o container do próximo vídeo quando o vídeo atual terminar
-        mainVideo.addEventListener('ended', () => {
-            if (nextVideoContainer) {
-                nextVideoContainer.classList.add('active');
+    if (!videoElement) return;
+    
+    // Cria nova instância do player
+    const player = videojs('content-player', {
+        autoplay: false,
+        controlBar: {
+            children: [
+                'playToggle',
+                'progressControl',
+                'currentTimeDisplay',
+                'timeDivider',
+                'durationDisplay',
+                'volumePanel',
+                'qualitySelector',
+                'fullscreenToggle',
+            ]
+        },
+        responsive: true,
+        fluid: true,
+        playbackRates: [0.5, 1, 1.25, 1.5, 2],
+        html5: {
+            vhs: {
+                overrideNative: true
             }
-        });
-        
-        // Inicializar event listeners
-        setupEventListeners();
-    }
+        }
+    });
     
-    // Configurar todos os event listeners
-    function setupEventListeners() {
-        // Play/Pause ao clicar no vídeo
-        videoContainer.addEventListener('click', function(e) {
-            if (e.target.closest('.player-controls') || e.target.closest('.settings-menu')) return;
-            togglePlayPause();
-        });
+    // Obtém o timestamp salvo (se houver)
+    const contentId = videoElement.dataset.contentId;
+    const contentType = videoElement.dataset.contentType;
+    const savedTime = getSavedPlaybackTime(contentId, contentType);
+    
+    // Configura eventos do player
+    player.on('ready', function() {
+        console.log('Player está pronto');
         
-        // Controle de Play/Pause
-        playPauseBtn.addEventListener('click', togglePlayPause);
-        
-        // Atualizar barra de progresso durante a reprodução
-        mainVideo.addEventListener('timeupdate', updateProgress);
-        
-        // Controle de clique na barra de progresso
-        progressArea.addEventListener('click', setProgress);
-        
-        // Controle de volume
-        volumeBtn.addEventListener('click', toggleMute);
-        volumeSlider.addEventListener('input', handleVolumeChange);
-        
-        // Botão de configurações
-        settingsBtn.addEventListener('click', toggleSettings);
-        
-        // Controle de tela cheia
-        fullscreenBtn.addEventListener('click', toggleFullscreen);
-        
-        // PiP (Picture-in-Picture)
-        pipBtn.addEventListener('click', togglePiP);
-        
-        // Voltar para o menu principal
-        backButtons.forEach(button => {
-            button.addEventListener('click', showMainMenu);
-        });
-        
-        // Controle de velocidade
-        speedBtn.addEventListener('click', () => {
-            hideMainMenu();
-            document.getElementById('speed-menu').classList.add('active');
-        });
-        
-        // Botão de qualidade
-        qualityBtn.addEventListener('click', () => {
-            hideMainMenu();
-            qualityMenu.classList.add('active');
-        });
-        
-        // Botão de legendas
-        captionsBtn.addEventListener('click', () => {
-            hideMainMenu();
-            captionsMenu.classList.add('active');
-        });
-        
-        // Esconder controles quando o mouse sai do player
-        videoContainer.addEventListener('mouseleave', () => {
-            if (!mainVideo.paused) {
-                scheduleHideControls();
+        // Restaura o tempo salvo de reprodução
+        if (savedTime && savedTime > 0) {
+            const confirmResume = confirm("Deseja continuar de onde parou? (" + formatTime(savedTime) + ")");
+            if (confirmResume) {
+                player.currentTime(savedTime);
             }
-        });
+        }
+    });
+    
+    // Salva progresso a cada 5 segundos durante a reprodução
+    player.on('timeupdate', function() {
+        const currentTime = player.currentTime();
+        const duration = player.duration();
         
-        // Mostrar controles quando o mouse entra no player
-        videoContainer.addEventListener('mouseenter', () => {
-            clearTimeout(controlsTimeout);
-        });
+        // Não salva se o conteúdo estiver no início ou no final
+        if (currentTime < 5 || (duration - currentTime) < 5) return;
         
-        // Teclado
-        document.addEventListener('keydown', handleKeyPress);
+        // Salva a cada 5 segundos para evitar muitas chamadas
+        if (Math.floor(currentTime) % 5 === 0) {
+            savePlaybackTime(contentId, contentType, currentTime);
+        }
         
-        // Itens da playlist
-        if (playlistItems) {
-            playlistItems.forEach(item => {
-                item.addEventListener('click', handlePlaylistClick);
-            });
+        // Marca como assistido automaticamente ao assistir 90%
+        if (currentTime >= (duration * 0.9)) {
+            markAsWatched(contentId, contentType);
         }
-    }
+    });
     
-    // Alternar entre play e pause
-    function togglePlayPause() {
-        if (mainVideo.paused) {
-            mainVideo.play();
-            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-            scheduleHideControls();
-        } else {
-            mainVideo.pause();
-            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
-            clearTimeout(controlsTimeout);
-        }
-    }
-    
-    // Atualizar a barra de progresso
-    function updateProgress() {
-        const percent = (mainVideo.currentTime / mainVideo.duration) * 100;
-        progressBar.style.width = `${percent}%`;
+    // Evento de finalização do vídeo
+    player.on('ended', function() {
+        console.log('Vídeo finalizado');
+        markAsWatched(contentId, contentType);
+        clearPlaybackTime(contentId, contentType);
         
-        // Atualizar o tempo mostrado
-        const currentMinutes = Math.floor(mainVideo.currentTime / 60);
-        const currentSeconds = Math.floor(mainVideo.currentTime % 60);
-        const durationMinutes = Math.floor(mainVideo.duration / 60);
-        const durationSeconds = Math.floor(mainVideo.duration % 60);
-        
-        timeDisplay.textContent = `${currentMinutes}:${currentSeconds < 10 ? '0' : ''}${currentSeconds} / ${durationMinutes}:${durationSeconds < 10 ? '0' : ''}${durationSeconds}`;
-    }
-    
-    // Atualizar o buffer do vídeo
-    function updateBuffer() {
-        if (mainVideo.buffered.length > 0) {
-            const bufferedEnd = mainVideo.buffered.end(mainVideo.buffered.length - 1);
-            const duration = mainVideo.duration;
-            const bufferedPercent = (bufferedEnd / duration) * 100;
-            bufferBar.style.width = `${bufferedPercent}%`;
-        }
-    }
-    
-    // Definir o progresso ao clicar na barra
-    function setProgress(e) {
-        const width = this.clientWidth;
-        const clickX = e.offsetX;
-        const duration = mainVideo.duration;
-        
-        mainVideo.currentTime = (clickX / width) * duration;
-    }
-    
-    // Alternar mudo/som
-    function toggleMute() {
-        if (mainVideo.volume === 0) {
-            mainVideo.volume = currentVolume;
-            volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-            volumeSlider.value = currentVolume * 100;
-        } else {
-            currentVolume = mainVideo.volume;
-            mainVideo.volume = 0;
-            volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
-            volumeSlider.value = 0;
-        }
-    }
-    
-    // Controlar mudança de volume
-    function handleVolumeChange() {
-        const volume = this.value / 100;
-        mainVideo.volume = volume;
-        currentVolume = volume;
-        
-        // Atualizar ícone com base no nível do volume
-        if (volume === 0) {
-            volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
-        } else if (volume < 0.5) {
-            volumeBtn.innerHTML = '<i class="fas fa-volume-down"></i>';
-        } else {
-            volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-        }
-    }
-    
-    // Alternar menu de configurações
-    function toggleSettings() {
-        if (isSettingsOpen) {
-            settingsMenu.classList.remove('active');
-            isSettingsOpen = false;
-        } else {
-            settingsMenu.classList.add('active');
-            showMainMenu();
-            isSettingsOpen = true;
-        }
-    }
-    
-    // Mostrar menu principal
-    function showMainMenu() {
-        document.querySelectorAll('.settings-submenu').forEach(menu => {
-            menu.classList.remove('active');
-        });
-        mainMenu.classList.add('active');
-    }
-    
-    // Esconder menu principal
-    function hideMainMenu() {
-        mainMenu.classList.remove('active');
-    }
-    
-    // Alternar tela cheia
-    function toggleFullscreen() {
-        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-            if (videoContainer.requestFullscreen) {
-                videoContainer.requestFullscreen();
-            } else if (videoContainer.webkitRequestFullscreen) {
-                videoContainer.webkitRequestFullscreen();
-            }
-            fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            }
-            fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
-        }
-    }
-    
-    // Alternar Picture-in-Picture
-    function togglePiP() {
-        if (document.pictureInPictureElement) {
-            document.exitPictureInPicture();
-        } else if (document.pictureInPictureEnabled) {
-            mainVideo.requestPictureInPicture();
-        }
-    }
-    
-    // Manipular teclas do teclado
-    function handleKeyPress(e) {
-        switch (e.key.toLowerCase()) {
-            case ' ':
-            case 'k':
-                // Espaço ou K para play/pause
-                togglePlayPause();
-                break;
-            case 'm':
-                // M para mutar
-                toggleMute();
-                break;
-            case 'f':
-                // F para tela cheia
-                toggleFullscreen();
-                break;
-            case 'arrowright':
-                // Seta direita para avançar 5 segundos
-                mainVideo.currentTime += 5;
-                break;
-            case 'arrowleft':
-                // Seta esquerda para retroceder 5 segundos
-                mainVideo.currentTime -= 5;
-                break;
-            case 'arrowup':
-                // Seta para cima para aumentar volume
-                if (mainVideo.volume + 0.1 > 1) {
-                    mainVideo.volume = 1;
-                } else {
-                    mainVideo.volume += 0.1;
-                }
-                volumeSlider.value = mainVideo.volume * 100;
-                break;
-            case 'arrowdown':
-                // Seta para baixo para diminuir volume
-                if (mainVideo.volume - 0.1 < 0) {
-                    mainVideo.volume = 0;
-                } else {
-                    mainVideo.volume -= 0.1;
-                }
-                volumeSlider.value = mainVideo.volume * 100;
-                break;
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-            case '8':
-            case '9':
-                // Números para pular para porcentagem do vídeo
-                const percent = parseInt(e.key) * 10;
-                mainVideo.currentTime = (mainVideo.duration * percent) / 100;
-                break;
-        }
-    }
-    
-    // Esconder controles após inatividade
-    function scheduleHideControls() {
-        clearTimeout(controlsTimeout);
-        if (!isSettingsOpen) {
-            controlsTimeout = setTimeout(() => {
-                document.querySelector('.player-controls').style.opacity = 0;
+        // Verifica se existe próximo episódio/filme para reproduzir automaticamente
+        const nextItemUrl = document.querySelector('.btn-next-item')?.getAttribute('href');
+        if (nextItemUrl) {
+            setTimeout(function() {
+                window.location.href = nextItemUrl;
             }, 3000);
         }
+    });
+    
+    return player;
+}
+
+/**
+ * Configura os botões de interação do usuário (marcar como assistido, favoritar, etc)
+ */
+function setupUserActionButtons() {
+    const watchedBtn = document.querySelector('.btn-mark-watched');
+    const favoriteBtn = document.querySelector('.btn-favorite');
+    
+    if (watchedBtn) {
+        watchedBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const contentId = this.dataset.contentId;
+            const contentType = this.dataset.contentType;
+            markAsWatched(contentId, contentType);
+        });
     }
     
-    // Manipular clique em item da playlist
-    function handlePlaylistClick() {
-        const videoId = this.dataset.videoId;
-        const videoUrl = this.dataset.videoUrl;
-        const videoTitle = this.querySelector('.video-info h3').textContent;
-        
-        // Atualizar o vídeo atual
-        mainVideo.src = videoUrl;
-        document.querySelector('.video-details h2').textContent = videoTitle;
-        
-        // Atualizar classe ativa
-        document.querySelector('.playlist-item.active')?.classList.remove('active');
-        this.classList.add('active');
-        
-        // Iniciar reprodução
-        mainVideo.play();
-        playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        
-        // Esconder o container do próximo vídeo se estiver visível
-        if (nextVideoContainer && nextVideoContainer.classList.contains('active')) {
-            nextVideoContainer.classList.remove('active');
+    if (favoriteBtn) {
+        favoriteBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const contentId = this.dataset.contentId;
+            const contentType = this.dataset.contentType;
+            toggleFavorite(contentId, contentType);
+        });
+    }
+}
+
+/**
+ * Salva o tempo de reprodução atual no localStorage e no servidor
+ */
+function savePlaybackTime(contentId, contentType, currentTime) {
+    if (!contentId || !contentType) return;
+    
+    // Chave para o localStorage
+    const storageKey = `playback_${contentType}_${contentId}`;
+    
+    // Salva localmente primeiro (fallback)
+    localStorage.setItem(storageKey, currentTime);
+    
+    // Salva no servidor via AJAX
+    fetch('ajax/save_playback_progress.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            content_id: contentId,
+            content_type: contentType,
+            current_time: currentTime
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Progresso salvo no servidor');
         }
+    })
+    .catch(error => {
+        console.error('Erro ao salvar progresso:', error);
+    });
+}
+
+/**
+ * Obtém o tempo de reprodução salvo
+ */
+function getSavedPlaybackTime(contentId, contentType) {
+    if (!contentId || !contentType) return 0;
+    
+    // Chave para o localStorage
+    const storageKey = `playback_${contentType}_${contentId}`;
+    
+    // Obtém do localStorage (fallback rápido)
+    const savedTime = localStorage.getItem(storageKey);
+    return savedTime ? parseFloat(savedTime) : 0;
+}
+
+/**
+ * Limpa o tempo de reprodução salvo (após assistir completo)
+ */
+function clearPlaybackTime(contentId, contentType) {
+    if (!contentId || !contentType) return;
+    
+    // Chave para o localStorage
+    const storageKey = `playback_${contentType}_${contentId}`;
+    
+    // Remove do localStorage
+    localStorage.removeItem(storageKey);
+    
+    // Remove do servidor
+    fetch('ajax/clear_playback_progress.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            content_id: contentId,
+            content_type: contentType
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Progresso limpo no servidor');
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao limpar progresso:', error);
+    });
+}
+
+/**
+ * Marca um conteúdo como assistido
+ */
+function markAsWatched(contentId, contentType) {
+    if (!contentId || !contentType) return;
+    
+    const watchedBtn = document.querySelector('.btn-mark-watched');
+    
+    // Atualiza no servidor
+    fetch('ajax/mark_as_watched.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            content_id: contentId,
+            content_type: contentType
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Marcado como assistido');
+            if (watchedBtn) {
+                watchedBtn.textContent = 'Assistido';
+                watchedBtn.classList.add('watched');
+                watchedBtn.disabled = true;
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao marcar como assistido:', error);
+    });
+}
+
+/**
+ * Alterna o status de favorito de um conteúdo
+ */
+function toggleFavorite(contentId, contentType) {
+    if (!contentId || !contentType) return;
+    
+    const favoriteBtn = document.querySelector('.btn-favorite');
+    
+    // Atualiza no servidor
+    fetch('ajax/toggle_favorite.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            content_id: contentId,
+            content_type: contentType
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (favoriteBtn) {
+                if (data.is_favorite) {
+                    favoriteBtn.innerHTML = '<i class="fas fa-heart"></i> Remover dos Favoritos';
+                    favoriteBtn.classList.add('favorited');
+                } else {
+                    favoriteBtn.innerHTML = '<i class="far fa-heart"></i> Adicionar aos Favoritos';
+                    favoriteBtn.classList.remove('favorited');
+                }
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao alterar favorito:', error);
+    });
+}
+
+/**
+ * Formata um timestamp em segundos para formato MM:SS ou HH:MM:SS
+ */
+function formatTime(seconds) {
+    seconds = Math.floor(seconds);
+    
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+    
+    if (hours > 0) {
+        return `${padZero(hours)}:${padZero(minutes)}:${padZero(remainingSeconds)}`;
     }
     
-    // Funções para alterar a velocidade de reprodução
-    window.changeSpeed = function(speed) {
-        mainVideo.playbackRate = speed;
-        document.querySelector('.speed-btn span').textContent = speed + 'x';
-        document.querySelectorAll('#speed-menu li').forEach(item => {
-            item.classList.remove('active');
-            if (item.dataset.speed == speed) {
-                item.classList.add('active');
-            }
-        });
-        toggleSettings();
-    };
-    
-    // Função para mudar a qualidade
-    window.changeQuality = function(quality) {
-        // Aqui você implementaria a lógica para mudar a qualidade
-        // Por exemplo, carregando uma fonte diferente do vídeo
-        console.log('Qualidade alterada para: ' + quality);
-        document.querySelector('.quality-btn span').textContent = quality;
-        document.querySelectorAll('#quality-menu li').forEach(item => {
-            item.classList.remove('active');
-            if (item.dataset.quality == quality) {
-                item.classList.add('active');
-            }
-        });
-        toggleSettings();
-    };
-    
-    // Função para ligar/desligar legendas
-    window.toggleCaptions = function(value) {
-        // Implementar lógica para mostrar/esconder legendas
-        if (value === 'on') {
-            mainVideo.textTracks[0].mode = 'showing';
-            document.querySelector('.captions-btn span').textContent = 'PT-BR';
-        } else {
-            mainVideo.textTracks[0].mode = 'hidden';
-            document.querySelector('.captions-btn span').textContent = 'Desligado';
-        }
-        document.querySelectorAll('#captions-menu li').forEach(item => {
-            item.classList.remove('active');
-            if (item.dataset.caption == value) {
-                item.classList.add('active');
-            }
-        });
-        toggleSettings();
-    };
-}); 
+    return `${padZero(minutes)}:${padZero(remainingSeconds)}`;
+}
+
+/**
+ * Adiciona zero à esquerda para números menores que 10
+ */
+function padZero(num) {
+    return num < 10 ? `0${num}` : num;
+} 

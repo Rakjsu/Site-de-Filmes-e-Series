@@ -46,4 +46,44 @@ mysql -u root -p site < api/database.sql
 
 ## Licença
 
-Este projeto está licenciado sob a licença MIT. Veja o arquivo LICENSE para mais detalhes. 
+Este projeto está licenciado sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+
+## Testes Automatizados
+
+### Backend (PHPUnit)
+
+- Para rodar todos os testes unitários e de integração do backend:
+
+```sh
+composer test
+```
+Ou diretamente:
+```sh
+vendor/bin/phpunit --colors=always
+```
+
+Os testes estão em `/tests` e cobrem autenticação, filmes, séries, usuários, gêneros, configurações, logs, estatísticas e APIs.
+
+### Frontend (Cypress)
+
+- Para rodar os testes E2E do frontend:
+
+```sh
+npx cypress open
+```
+Ou em modo headless:
+```sh
+npx cypress run
+```
+
+Os testes estão em `/cypress/e2e` e cobrem login, navegação e APIs.
+
+### Boas práticas para colaboração
+- Sempre escreva testes para novas funcionalidades e correções de bugs.
+- Mantenha os testes organizados por módulo.
+- Rode todos os testes antes de enviar PRs ou deploys.
+- Documente cenários de teste relevantes no próprio código ou no README.
+
+---
+
+Dúvidas ou sugestões? Abra uma issue ou PR! 

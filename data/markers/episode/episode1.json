@@ -1,0 +1,21 @@
+{
+    "markers": [
+        {
+            "time": 60,
+            "title": "Recap do episódio anterior"
+        },
+        {
+            "time": 180,
+            "title": "Cena importante"
+        },
+        {
+            "time": 360,
+            "title": "Momento engraçado"
+        },
+        {
+            "time": 540,
+            "title": "Gancho para o próximo episódio"
+        }
+    ],
+    "updatedAt": "2023-08-30 16:45:00"
+} 

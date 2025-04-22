@@ -1,0 +1,335 @@
+/**
+ * Estilos para o player de vídeo avançado
+ *
+ * Este arquivo contém os estilos para os recursos avançados do player,
+ * incluindo marcadores de cena, countdown para próximo episódio,
+ * e botões personalizados.
+ */
+
+/* Contêiner para o countdown do próximo episódio */
+.next-episode-countdown {
+    position: absolute;
+    right: 0;
+    bottom: 70px;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 15px;
+    border-radius: 4px;
+    z-index: 10;
+    width: 280px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.5s ease-in-out;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.countdown-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.countdown-title {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.countdown-timer {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 5px 0 15px;
+}
+
+.countdown-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.countdown-buttons button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.countdown-cancel {
+    background-color: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+}
+
+.countdown-cancel:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.countdown-play {
+    background-color: #e50914;
+    color: #fff;
+}
+
+.countdown-play:hover {
+    background-color: #f40612;
+}
+
+/* Botão de Picture-in-Picture */
+.vjs-pip-button {
+    font-size: 1.8em;
+    cursor: pointer;
+}
+
+.vjs-pip-button .vjs-icon-picture-in-picture:before {
+    content: "\f121";
+}
+
+/* Marcadores de cena na barra de progresso */
+.vjs-scene-marker {
+    position: absolute;
+    width: 5px;
+    height: 100%;
+    background-color: #e50914;
+    top: 0;
+    z-index: 1;
+    opacity: 0.8;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.vjs-scene-marker:hover {
+    transform: scaleX(1.5) scaleY(1.2);
+    opacity: 1;
+}
+
+/* Tooltip para o nome do marcador de cena */
+.vjs-scene-marker::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 11;
+}
+
+.vjs-scene-marker:hover::after {
+    opacity: 1;
+}
+
+/* Botão de adicionar marcador */
+.vjs-marker-button {
+    font-size: 1.8em;
+    cursor: pointer;
+}
+
+.vjs-marker-button .vjs-icon-bookmark:before {
+    content: "\f097";
+}
+
+/* Estilo para o menu de qualidade de vídeo */
+.vjs-quality-menu .vjs-menu-content {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    max-height: none;
+}
+
+.vjs-quality-menu .vjs-menu-content li {
+    font-size: 14px;
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.vjs-quality-menu .vjs-menu-content li:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.vjs-quality-menu .vjs-menu-content li.vjs-selected {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Teclado e Atalhos */
+.keyboard-shortcuts {
+    margin-top: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.shortcuts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.shortcuts-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.toggle-shortcuts {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px;
+}
+
+.shortcuts-content {
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.shortcuts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.shortcut-item {
+    display: flex;
+    align-items: center;
+}
+
+.key-combo {
+    display: inline-block;
+    padding: 3px 8px;
+    margin-right: 10px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 12px;
+    min-width: 40px;
+    text-align: center;
+}
+
+.key-action {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Controles de Administrador */
+.admin-controls {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    border-left: 3px solid #e50914;
+}
+
+.admin-controls h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.admin-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.admin-buttons button {
+    padding: 8px 15px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.admin-buttons button:hover {
+    background-color: rgba(0, 0, 0, 0.6);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.admin-buttons button i {
+    font-size: 12px;
+}
+
+.btn-edit-content {
+    color: #4CAF50 !important;
+}
+
+.btn-manage-markers {
+    color: #2196F3 !important;
+}
+
+/* Responsivo para telas menores */
+@media (max-width: 768px) {
+    .next-episode-countdown {
+        bottom: 50px;
+        width: 220px;
+        padding: 10px;
+    }
+    
+    .countdown-timer {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+    
+    .countdown-buttons button {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    .shortcuts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .admin-buttons {
+        flex-direction: column;
+    }
+}
+
+/* Alterações para modo fullscreen */
+.video-js.vjs-fullscreen .vjs-scene-marker {
+    height: 100%;
+}
+
+.video-js.vjs-fullscreen .next-episode-countdown {
+    bottom: 100px;
+    right: 20px;
+    width: 320px;
+}
+
+/* Ajustes em tema escuro */
+.dark-theme .vjs-scene-marker {
+    background-color: #ff5f5f;
+}
+
+.dark-theme .countdown-play {
+    background-color: #ff5f5f;
+}
+
+.dark-theme .countdown-play:hover {
+    background-color: #ff7070;
+} 

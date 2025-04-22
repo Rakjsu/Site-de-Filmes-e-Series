@@ -5,7 +5,7 @@
  * Este arquivo contém funções para gerenciar a autenticação de usuários,
  * incluindo login, verificação de autenticação e logout.
  * 
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 // Incluir a configuração do banco de dados
@@ -101,6 +101,12 @@ function loginUser($username, $password, $remember = false) {
         'is_admin' => $userData['is_admin'],
         'last_login' => time()
     ];
+    // Salvar user_role apenas se for admin
+    if ($userData['is_admin']) {
+        $_SESSION['user_role'] = 'admin';
+    } else {
+        unset($_SESSION['user_role']);
+    }
     
     // Atualizar o último login
     updateLastLogin($userData['id']);
@@ -110,6 +116,10 @@ function loginUser($username, $password, $remember = false) {
         $token = generateRememberToken();
         setRememberCookie($userData['id'], $token);
     }
+    
+    error_log(print_r($userData, true));
+    
+    error_log('Sessão após login: ' . print_r($_SESSION, true));
     
     return [
         'status' => 'success',
