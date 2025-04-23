@@ -144,4 +144,37 @@ INSERT INTO episodes (season_id, series_id, title, description, number, duration
 
 -- Inserir usuário admin (senha: admin123)
 INSERT INTO users (username, email, password, role) VALUES
-('admin', 'admin@exemplo.com', '$2y$10$XcOAFQ0HfyQwMIbwnXbq/ebLiMt1sP8zTw66lk6aSuPvEjaOBIZmm', 'admin'); 
+('admin', 'admin@exemplo.com', '$2y$10$XcOAFQ0HfyQwMIbwnXbq/ebLiMt1sP8zTw66lk6aSuPvEjaOBIZmm', 'admin');
+
+-- Tabela para layout global do dashboard admin
+CREATE TABLE IF NOT EXISTS admin_dashboard_layout (
+    id INT PRIMARY KEY DEFAULT 1,
+    layout JSON NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO admin_dashboard_layout (id, layout) VALUES
+(1, '{"rows":[["novos-usuarios","visualizacoes"],["mais-vistos","avisos"]]}')
+ON DUPLICATE KEY UPDATE layout=VALUES(layout);
+
+-- Tabela de filmes (v1.0.0)
+CREATE TABLE IF NOT EXISTS filmes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tmdb_id INT NOT NULL,
+    imdb_id VARCHAR(32),
+    titulo VARCHAR(255) NOT NULL,
+    titulo_original VARCHAR(255),
+    sinopse TEXT,
+    poster_url VARCHAR(255),
+    backdrop_url VARCHAR(255),
+    ano INT,
+    duracao INT,
+    generos VARCHAR(255),
+    elenco TEXT,
+    equipe TEXT,
+    trailer_url VARCHAR(255),
+    nota DECIMAL(3,1),
+    fonte_nota ENUM('imdb','tmdb') DEFAULT 'tmdb',
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4; 

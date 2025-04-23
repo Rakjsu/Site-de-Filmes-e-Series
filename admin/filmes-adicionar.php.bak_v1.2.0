@@ -1,0 +1,230 @@
+<?php
+// filmes-adicionar.php v1.2.0 - Página de adição de filmes (layout completo + integração TMDb + preview dinâmico)
+$pageTitle = 'Adicionar Filme';
+$breadcrumbs = ['Filmes' => 'filmes.php', 'Adicionar Filme' => null];
+$pageCss = [];
+$pageScripts = [];
+include_once 'templates/header.php';
+?>
+<div class="admin-wrapper">
+  <main class="admin-main d-flex bg-light" style="min-height:100vh;">
+    <?php include 'templates/sidebar.php'; ?>
+    <div class="main-content flex-grow-1 p-4">
+      <h2 class="fw-bold mb-4">Adicionar Filme</h2>
+      <!-- Box de importação TMDb -->
+      <div class="card p-4 mb-4 shadow-sm">
+        <form class="row g-3 align-items-center" id="import-tmdb-form" autocomplete="off">
+          <div class="col-auto">
+            <label for="tmdb_id" class="col-form-label fw-bold">Importar filme pelo ID do TMDb:</label>
+          </div>
+          <div class="col-auto">
+            <input type="number" min="1" class="form-control" id="tmdb_id" name="tmdb_id" placeholder="Ex: 603" style="width:140px;">
+          </div>
+          <div class="col-auto">
+            <button type="button" class="btn btn-primary" id="btn-buscar-tmdb">
+              <i class="fas fa-search me-2"></i>Buscar
+            </button>
+          </div>
+          <div class="col-auto" id="import-status"></div>
+        </form>
+      </div>
+      <!-- Formulário de cadastro/edição -->
+      <form id="form-filme" class="row g-4">
+        <div class="col-12 col-lg-8">
+          <div class="card p-4 mb-4">
+            <div class="row g-3">
+              <div class="col-12 col-md-8">
+                <label class="form-label fw-bold">Título</label>
+                <input type="text" class="form-control" id="titulo" name="titulo" required>
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label fw-bold">Slug (URL)</label>
+                <input type="text" class="form-control" id="slug" name="slug" placeholder="exemplo-filme">
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold">Sinopse</label>
+                <textarea class="form-control" id="sinopse" name="sinopse" rows="3"></textarea>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-bold">Atores</label>
+                <input type="text" class="form-control" id="atores" name="atores" placeholder="Separe por vírgula">
+              </div>
+              <div class="col-12 col-md-3">
+                <label class="form-label fw-bold">Diretor</label>
+                <input type="text" class="form-control" id="diretor" name="diretor">
+              </div>
+              <div class="col-12 col-md-3">
+                <label class="form-label fw-bold">Escritor</label>
+                <input type="text" class="form-control" id="escritor" name="escritor">
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label fw-bold">Nota</label>
+                <input type="number" step="0.1" min="0" max="10" class="form-control" id="nota" name="nota">
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label fw-bold">Lançamento</label>
+                <input type="date" class="form-control" id="lancamento" name="lancamento">
+              </div>
+              <div class="col-12 col-md-4">
+                <label class="form-label fw-bold">Gênero</label>
+                <input type="text" class="form-control" id="genero" name="genero" placeholder="Separe por vírgula">
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-bold">Tempo de Execução (min)</label>
+                <input type="number" min="1" class="form-control" id="duracao" name="duracao">
+              </div>
+              <div class="col-12 col-md-6 d-flex align-items-center justify-content-end">
+                <label class="form-label fw-bold mb-0 me-3">Status:</label>
+                <div class="form-switch-red">
+                  <input class="form-check-input" type="checkbox" id="publicado" name="publicado" checked>
+                  <label class="form-check-label ms-2" for="publicado" id="label-publicado">Publicado</label>
+                </div>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold">Trailer (YouTube)</label>
+                <input type="url" class="form-control" id="trailer" name="trailer" placeholder="https://youtube.com/watch?v=...">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-4">
+          <div class="card p-4 mb-4">
+            <div class="mb-3">
+              <label class="form-label fw-bold">Poster</label>
+              <input type="url" class="form-control mb-2" id="poster" name="poster" placeholder="URL do poster">
+              <img id="poster-preview" src="" alt="Poster" class="img-fluid rounded shadow-sm d-none" style="max-height:220px;">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Thumb</label>
+              <input type="url" class="form-control mb-2" id="thumb" name="thumb" placeholder="URL da thumb">
+              <img id="thumb-preview" src="" alt="Thumb" class="img-fluid rounded shadow-sm d-none" style="max-height:120px;">
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Tags</label>
+              <input type="text" class="form-control" id="tags" name="tags" placeholder="Separe por vírgula">
+            </div>
+          </div>
+        </div>
+        <div class="col-12 text-end">
+          <button type="submit" class="btn btn-success btn-lg px-5">
+            <i class="fas fa-save me-2"></i>Salvar Filme
+          </button>
+        </div>
+      </form>
+      <style>
+      .form-switch-red .form-check-input {
+        width: 3em;
+        height: 1.5em;
+        background-color: #f8d7da;
+        border: 2px solid #ef4444;
+        transition: background 0.3s, border 0.3s;
+        box-shadow: none;
+      }
+      .form-switch-red .form-check-input:checked {
+        background-color: #ef4444;
+        border-color: #ef4444;
+      }
+      .form-switch-red .form-check-input:focus {
+        box-shadow: 0 0 0 0.2rem rgba(239,68,68,.25);
+      }
+      .form-switch-red .form-check-input:checked + .form-check-label {
+        color: #ef4444;
+        font-weight: bold;
+      }
+      </style>
+      <script>
+      // Chave da API TMDb
+      const TMDB_API_KEY = '9d8ec8b10e9b4acd85853c44b29bd83a';
+      const TMDB_BASE = 'https://api.themoviedb.org/3/movie/';
+      const TMDB_IMG = 'https://image.tmdb.org/t/p/w500';
+      const TMDB_BACKDROP = 'https://image.tmdb.org/t/p/w780';
+
+      // Buscar filme no TMDb
+      document.getElementById('btn-buscar-tmdb').addEventListener('click', async function() {
+        const id = document.getElementById('tmdb_id').value.trim();
+        const status = document.getElementById('import-status');
+        if (!id) {
+          status.innerHTML = '<span class="text-danger">Informe o ID do TMDb.</span>';
+          return;
+        }
+        status.innerHTML = '<span class="text-info">Buscando...</span>';
+        this.disabled = true;
+        try {
+          const res = await fetch(`${TMDB_BASE}${id}?api_key=${TMDB_API_KEY}&language=pt-BR&append_to_response=credits,videos`);
+          if (!res.ok) throw new Error('Filme não encontrado');
+          const data = await res.json();
+          preencherCamposTMDb(data);
+          status.innerHTML = '<span class="text-success">Filme importado com sucesso!</span>';
+        } catch (e) {
+          status.innerHTML = '<span class="text-danger">Erro: ' + e.message + '</span>';
+        }
+        this.disabled = false;
+      });
+
+      // Preencher campos do formulário com dados do TMDb
+      function preencherCamposTMDb(data) {
+        document.getElementById('titulo').value = data.title || '';
+        document.getElementById('slug').value = slugify(data.title || '');
+        document.getElementById('sinopse').value = data.overview || '';
+        document.getElementById('nota').value = data.vote_average || '';
+        document.getElementById('lancamento').value = data.release_date || '';
+        document.getElementById('genero').value = (data.genres || []).map(g => g.name).join(', ');
+        document.getElementById('duracao').value = data.runtime || '';
+        document.getElementById('poster').value = data.poster_path ? TMDB_IMG + data.poster_path : '';
+        document.getElementById('thumb').value = data.backdrop_path ? TMDB_BACKDROP + data.backdrop_path : '';
+        document.getElementById('tags').value = (data.keywords && data.keywords.keywords ? data.keywords.keywords.map(k => k.name).join(', ') : '');
+        // Trailer (YouTube)
+        let trailer = '';
+        if (data.videos && data.videos.results) {
+          const yt = data.videos.results.find(v => v.site === 'YouTube' && v.type === 'Trailer');
+          if (yt) trailer = 'https://youtube.com/watch?v=' + yt.key;
+        }
+        document.getElementById('trailer').value = trailer;
+        // Elenco, diretor, escritor
+        let atores = [], diretor = '', escritor = '';
+        if (data.credits && data.credits.cast) {
+          atores = data.credits.cast.slice(0, 5).map(a => a.name);
+        }
+        if (data.credits && data.credits.crew) {
+          const dir = data.credits.crew.find(p => p.job === 'Director');
+          if (dir) diretor = dir.name;
+          const esc = data.credits.crew.find(p => p.job === 'Writer' || p.job === 'Screenplay');
+          if (esc) escritor = esc.name;
+        }
+        document.getElementById('atores').value = atores.join(', ');
+        document.getElementById('diretor').value = diretor;
+        document.getElementById('escritor').value = escritor;
+        // Atualizar previews
+        atualizarPreview('poster');
+        atualizarPreview('thumb');
+      }
+
+      // Slugify título
+      function slugify(text) {
+        return text.toString().toLowerCase()
+          .replace(/\s+/g, '-')
+          .replace(/[^\w\-]+/g, '')
+          .replace(/\-\-+/g, '-')
+          .replace(/^-+/, '')
+          .replace(/-+$/, '');
+      }
+
+      // Atualizar preview de poster/thumb
+      function atualizarPreview(tipo) {
+        const input = document.getElementById(tipo);
+        const preview = document.getElementById(tipo+'-preview');
+        if (input.value) {
+          preview.src = input.value;
+          preview.classList.remove('d-none');
+        } else {
+          preview.src = '';
+          preview.classList.add('d-none');
+        }
+      }
+      document.getElementById('poster').addEventListener('input', function() { atualizarPreview('poster'); });
+      document.getElementById('thumb').addEventListener('input', function() { atualizarPreview('thumb'); });
+      </script>
+    </div>
+  </main>
+</div>
+<?php include_once 'templates/footer.php'; ?> 

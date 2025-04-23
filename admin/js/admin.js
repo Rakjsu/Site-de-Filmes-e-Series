@@ -1,6 +1,6 @@
 /**
  * Script principal para o Painel Administrativo
- * Versão: 1.0.0
+ * Versão: 1.1.0
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -155,24 +155,22 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     function initPreloader() {
         const preloader = document.getElementById('preloader');
-        
         if (preloader) {
-            // Remover o preloader após a página carregar completamente
-            window.addEventListener('load', function() {
-                preloader.classList.add('fade-out');
-                
-                // Remover completamente após a animação
-                setTimeout(function() {
-                    preloader.style.display = 'none';
-                }, 500);
-            });
-            
-            // Caso já esteja carregada
+            let removed = false;
+            function removePreloader() {
+                if (!removed) {
+                    preloader.classList.add('fade-out');
+                    setTimeout(function() {
+                        preloader.remove();
+                    }, 500);
+                    removed = true;
+                }
+            }
+            window.addEventListener('load', removePreloader);
+            // Fallback: remove após 5 segundos mesmo se o load não disparar
+            setTimeout(removePreloader, 5000);
             if (document.readyState === 'complete') {
-                preloader.classList.add('fade-out');
-                setTimeout(function() {
-                    preloader.style.display = 'none';
-                }, 500);
+                removePreloader();
             }
         }
     }

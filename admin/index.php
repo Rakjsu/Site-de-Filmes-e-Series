@@ -44,17 +44,34 @@ $atividadesRecentes = [
 // Exemplo de badge de notificação (ex: novos usuários)
 $novosUsuariosHoje = 4;
 
-// Dados simulados para os gráficos
-$visualizacoesSemana = [1200, 1900, 2300, 1800, 2500, 3100, 2700];
-$labelsSemana = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+// Dados simulados para widgets modularizados
+$novosUsuarios = [
+    ['nome' => 'João Silva', 'email' => 'joao.silva@example.com', 'avatar' => '../assets/img/avatars/user1.jpg', 'data' => '15/10/2023'],
+    ['nome' => 'Maria Oliveira', 'email' => 'maria.oliveira@example.com', 'avatar' => '../assets/img/avatars/user2.jpg', 'data' => '18/10/2023'],
+    ['nome' => 'Carlos Santos', 'email' => 'carlos.santos@example.com', 'avatar' => '../assets/img/avatars/user3.jpg', 'data' => '20/10/2023'],
+];
+$visualizacoes = [
+    'total' => 14950,
+    'grafico' => [
+        ['label' => 'Seg', 'valor' => 1200],
+        ['label' => 'Ter', 'valor' => 1900],
+        ['label' => 'Qua', 'valor' => 2300],
+        ['label' => 'Qui', 'valor' => 1800],
+        ['label' => 'Sex', 'valor' => 2500],
+        ['label' => 'Sáb', 'valor' => 3100],
+        ['label' => 'Dom', 'valor' => 2700],
+    ]
+];
 $maisVistos = [
-    ['titulo' => 'Interestelar', 'visualizacoes' => 15420],
-    ['titulo' => 'Vingadores: Ultimato', 'visualizacoes' => 12850],
-    ['titulo' => 'Breaking Bad', 'visualizacoes' => 11200],
-    ['titulo' => 'Stranger Things', 'visualizacoes' => 9800],
-    ['titulo' => 'O Poderoso Chefão', 'visualizacoes' => 9500],
-    ['titulo' => 'Game of Thrones', 'visualizacoes' => 8700],
-    ['titulo' => 'Pulp Fiction', 'visualizacoes' => 7890],
+    ['titulo' => 'Interestelar', 'tipo' => 'filme', 'views' => 15420],
+    ['titulo' => 'Vingadores: Ultimato', 'tipo' => 'filme', 'views' => 12850],
+    ['titulo' => 'Breaking Bad', 'tipo' => 'serie', 'views' => 11200],
+    ['titulo' => 'Stranger Things', 'tipo' => 'serie', 'views' => 9800],
+];
+$avisos = [
+    ['mensagem' => 'Backup agendado para hoje às 23h', 'tipo' => 'info', 'data' => 'Hoje'],
+    ['mensagem' => 'Nova versão disponível para atualização', 'tipo' => 'warning', 'data' => 'Ontem'],
+    ['mensagem' => '2 usuários aguardando aprovação', 'tipo' => 'danger', 'data' => 'Esta semana'],
 ];
 
 // Script para os gráficos
@@ -185,6 +202,10 @@ $pageCss = ['css/admin-dashboard.css'];
 // Scripts específicos para esta página
 $pageScripts = [];
 
+// Incluir SortableJS via CDN para drag & drop
+$pageScripts[] = 'https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js';
+$pageScripts[] = 'js/admin-dashboard.js';
+
 // Incluir template de cabeçalho
 include_once 'templates/header.php';
 
@@ -285,46 +306,12 @@ error_log('PHPSESSID: ' . session_id());
 
                 <!-- Exemplo de widgets customizáveis -->
                 <div class="dashboard-widgets-row">
-                    <div class="dashboard-widget" style="min-width:320px;max-width:600px;">
-                        <h4 style="margin-bottom:1rem;font-weight:600;color:var(--color-primary);">Novos Usuários na Semana</h4>
-                        <div style="height:180px;">
-                            <canvas id="widgetChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="dashboard-widget" style="min-width:320px;max-width:600px;">
-                        <div style="display:flex;align-items:center;justify-content:space-between;">
-                            <h4 style="margin-bottom:1rem;font-weight:600;color:var(--color-secondary);">Visualizações</h4>
-                            <select id="filtro-views" class="form-select form-select-sm" style="width:auto;min-width:140px;">
-                                <option value="7dias">Últimos 7 dias</option>
-                                <option value="mes">Este mês</option>
-                            </select>
-                        </div>
-                        <div style="height:180px;">
-                            <canvas id="viewsChart"></canvas>
-                        </div>
-                    </div>
+                    <?php include 'components/widgets/widget-novos-usuarios.php'; ?>
+                    <?php include 'components/widgets/widget-visualizacoes.php'; ?>
                 </div>
                 <div class="dashboard-widgets-row">
-                    <div class="dashboard-widget" style="min-width:320px;max-width:600px;">
-                        <div style="display:flex;align-items:center;justify-content:space-between;">
-                            <h4 style="margin-bottom:1rem;font-weight:600;color:#18181b;">Mais Vistos: Filmes & Séries</h4>
-                            <select id="filtro-top" class="form-select form-select-sm" style="width:auto;min-width:140px;">
-                                <option value="7dias">Últimos 7 dias</option>
-                                <option value="mes">Este mês</option>
-                            </select>
-                        </div>
-                        <div style="height:220px;">
-                            <canvas id="topChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="dashboard-widget" style="min-width:320px;max-width:600px;">
-                        <h4 style="margin-bottom:1rem;font-weight:600;color:var(--color-secondary);">Avisos do Sistema</h4>
-                        <ul style="margin:0;padding-left:1.2rem;">
-                            <li>Backup agendado para hoje às 23h</li>
-                            <li>Nova versão disponível para atualização</li>
-                            <li>2 usuários aguardando aprovação</li>
-                        </ul>
-                    </div>
+                    <?php include 'components/widgets/widget-mais-vistos.php'; ?>
+                    <?php include 'components/widgets/widget-avisos.php'; ?>
                 </div>
 
                 <!-- Grid responsivo para listas -->

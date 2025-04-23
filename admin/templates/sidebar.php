@@ -66,6 +66,24 @@ $adminAvatar = "../assets/img/avatars/admin.jpg";
                         <span>Gênero</span>
                     </a>
                 </li>
+                <li>
+                    <a href="atores.php" class="nav-link <?php echo isActive('atores.php'); ?>">
+                        <i class="fas fa-user-friends"></i>
+                        <span>Atores</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="diretores.php" class="nav-link <?php echo isActive('diretores.php'); ?>">
+                        <i class="fas fa-video"></i>
+                        <span>Diretores</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="escritores.php" class="nav-link <?php echo isActive('escritores.php'); ?>">
+                        <i class="fas fa-pen-nib"></i>
+                        <span>Escritores</span>
+                    </a>
+                </li>
             </ul>
         </div>
         <div class="nav-section">
