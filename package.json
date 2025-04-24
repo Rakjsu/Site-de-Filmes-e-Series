@@ -1,12 +1,14 @@
 {
   "name": "player-streaming-frontend",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Testes E2E com Cypress para plataforma de streaming.",
   "scripts": {
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run"
+    "cypress:run": "cypress run",
+    "release": "standard-version"
   },
   "devDependencies": {
-    "cypress": "^13.0.0"
+    "cypress": "^13.0.0",
+    "standard-version": "^9.5.0"
   }
-} 
+}
